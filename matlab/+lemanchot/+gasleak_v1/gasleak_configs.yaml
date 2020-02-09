@@ -1,0 +1,15 @@
+
+info:
+  author: Parham Nooralishahi
+  email: parham.nooralishahi@gmail.com
+  org_email: parham.nooralishahi.1@ulaval.ca
+  organization: Laval University
+
+dataset:
+  directory: /home-local2/panoo.extra.nobkp/Datasets/TORNGATS_Optical_Gas/2040_exp01
+  filter: '*.png'
+
+props:
+  bounding_size: 400
+  focal_length: 2000
+

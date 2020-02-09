@@ -26,8 +26,10 @@ classdef ListImageGrabber < matlab.System & matlab.system.mixin.Propagates
     methods
         % Constructor
         function obj = ListImageGrabber(varargin)
-            % Support name-value pair arguments when constructing object
-            setProperties(obj,nargin,varargin{:})
+            if nargin > 0
+                % Support name-value pair arguments when constructing object
+                setProperties(obj,nargin,varargin{:})
+            end
         end
     end
 
@@ -80,9 +82,9 @@ classdef ListImageGrabber < matlab.System & matlab.system.mixin.Propagates
             if ~isinteger(obj.frameRate) || obj.frameRate <= 0
                 error('Framerate must be a positive integer');
             end
-            if isempty(obj.resourceList) || ~isa(obj.resourceList,'string')
-                error('resource list must be a non-empty string array');
-            end
+%             if isempty(obj.resourceList) || ~isa(obj.resourceList,'string')
+%                 error('resource list must be a non-empty string array');
+%             end
         end
 
         function ds = getDiscreteStateImpl(obj)
