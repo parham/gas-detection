@@ -1,19 +1,30 @@
 classdef (ConstructOnLoad) YamlConfigurable < dynamicprops
     %YAMLCONFIGURABLE The base class for any Yaml-based configurable component
     
-    methods
+    methods(Access = public)
         function [obj, props] = YamlConfigurable(varargin)
             %CONFIGURABLE Construct an instance of this class
             props = [];
             if nargin > 0
-                 args = lemanchot.utils.props2struct(varargin);
-                 if isfield(args, 'ConfigFilePath')
-                     props = lemanchot.configuration.YamlConfigurable.loadYamlConfig(args.ConfigFilePath);
-                     if isfield(args, 'ConfigFileSection')
-                         props = lemanchot.configuration.YamlConfigurable.getSection(props, args.ConfigFileSection);
-                     end
-                     obj.configure(props);
-                 end
+                section = [];
+                args = lemanchot.utils.props2struct(varargin);
+                props = struct();
+                if isfield(args, 'ConfigFileSection')
+                    section = args.ConfigFileSection;
+                end
+                if isfield(args, 'ConfigFilePath')
+                    props = lemanchot.configuration.YamlConfigurable.loadYamlConfig(args.ConfigFilePath);
+                elseif isfield(args, 'ConfigStructure')
+                    props = args.ConfigStructure;
+                elseif isfield(args, 'DefaultConfigFilePath')
+                    props = lemanchot.configuration.YamlConfigurable.loadYamlConfig(args.DefaultConfigFilePath);
+                end
+                
+                if ~isempty(section) && ~isempty(fieldnames(props))
+                    props = lemanchot.configuration.YamlConfigurable.getSection(props, section);
+                end
+                
+                obj.configure(props);
             end
         end
         
@@ -24,17 +35,15 @@ classdef (ConstructOnLoad) YamlConfigurable < dynamicprops
             end
             
             keys = fieldnames(targetProps);
-            if isempty(keys)
-                error('No property is determined!')
-            end
-            
-            for index=1:length(keys)
-                k = keys{index}
-                v = targetProps.(k);
-                if ~isprop(obj,k)
-                    addprop(obj,k);
+            if ~isempty(keys)
+                for index=1:length(keys)
+                    k = keys{index};
+                    v = targetProps.(k);
+                    if ~isprop(obj,k)
+                        addprop(obj,k);
+                    end
+                    obj.(k) = v;
                 end
-                obj.(k) = v;
             end
         end
     end

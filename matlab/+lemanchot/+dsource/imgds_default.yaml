@@ -1,0 +1,13 @@
+
+info:
+  author: Parham Nooralishahi
+  email: parham.nooralishahi@gmail.com
+  org_email: parham.nooralishahi.1@ulaval.ca
+  organization: Laval University
+
+img_dataset:
+  datasetPath: ./ds/test/
+  imgSize:
+    - 600
+    - 800
+  resizeMethod: bilinear
