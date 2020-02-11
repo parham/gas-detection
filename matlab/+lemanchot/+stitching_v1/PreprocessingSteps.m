@@ -34,7 +34,7 @@ classdef PreprocessingSteps < matlab.System & ...
     end
 
     methods(Access = protected)
-        %% Common functions
+        % Common functions
         function setupImpl(obj)
             obj.previousFrame = [];
         end
@@ -62,7 +62,7 @@ classdef PreprocessingSteps < matlab.System & ...
             obj.previousFrame = [];
         end
 
-        %% Backup/restore functions
+        % Backup/restore functions
         function s = saveObjectImpl(obj)
             s = saveObjectImpl@matlab.System(obj);
 
@@ -79,7 +79,7 @@ classdef PreprocessingSteps < matlab.System & ...
             loadObjectImpl@matlab.System(obj,s,wasLocked);
         end
 
-        %% Advanced functions
+        % Advanced functions
         function validateInputsImpl(obj,u)
             % Validate inputs to the step method at initialization
         end

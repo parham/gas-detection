@@ -1,0 +1,18 @@
+
+info:
+  author: Parham Nooralishahi
+  email: parham.nooralishahi@gmail.com
+  org_email: parham.nooralishahi.1@ulaval.ca
+  organization: Laval University
+  project: A Novel Approach of Drone-based IR Gas Leak Detection Using Image Flow Analysis
+
+img_dataset:
+  datasetPath: /home-local2/panoo.extra.nobkp/Datasets/TORNGATS_Optical_Gas/2040_exp01
+  imgSize:
+    - 600
+    - 800
+  resizeMethod: bilinear
+
+fernando_vstab:
+  # Transformation Type; translation, rigid, similarity
+  transformType: similarity

@@ -7,7 +7,7 @@ classdef (ConstructOnLoad) YamlConfigurable < dynamicprops
             props = [];
             if nargin > 0
                 section = [];
-                args = lemanchot.utils.props2struct(varargin);
+                args = lemanchot.utils.props2struct(varargin{:});
                 props = struct();
                 if isfield(args, 'ConfigFileSection')
                     section = args.ConfigFileSection;

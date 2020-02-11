@@ -20,17 +20,17 @@ classdef ImageFolderDataSource < matlab.System & ...
         % Constructor
         function obj = ImageFolderDataSource(varargin)
             obj = obj@lemanchot.configuration.YamlConfigurable( ...
-                varargin, 'ConfigFileSection', 'img_dataset', ...
-                'DefaultConfigFilePath', './+lemanchot/+dsource/imgds_default.yaml');
+                cat(2, varargin, 'ConfigFileSection', 'img_dataset', ...
+                    'DefaultConfigFilePath', './+lemanchot/+dsource/imgds_default.yaml'));
             
             if isprop(obj, 'imgSize') && iscell(obj.imgSize)
                 obj.imgSize = reshape(cell2array(obj.imgSize), [], 2);
             end
             
-            if nargin > 0
-                % Support name-value pair arguments when constructing object
-                setProperties(obj,nargin,varargin{:})
-            end
+%             if nargin > 0
+%                 % Support name-value pair arguments when constructing object
+%                 setProperties(obj,nargin,varargin{:})
+%             end
         end
     end
 
