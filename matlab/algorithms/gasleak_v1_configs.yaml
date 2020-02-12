@@ -16,3 +16,11 @@ img_dataset:
 fernando_vstab:
   # Transformation Type; translation, rigid, similarity
   transformType: similarity
+
+roi_crop:
+  position:
+    - 238
+    - 1
+  size:
+    - 315
+    - 211

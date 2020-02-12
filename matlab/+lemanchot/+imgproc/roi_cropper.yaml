@@ -1,0 +1,14 @@
+
+info:
+  author: Parham Nooralishahi
+  email: parham.nooralishahi@gmail.com
+  org_email: parham.nooralishahi.1@ulaval.ca
+  organization: Laval University
+
+roi_crop:
+  position:
+    - 100
+    - 200
+  size:
+    - 250
+    - 300
