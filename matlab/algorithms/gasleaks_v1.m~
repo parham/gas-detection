@@ -60,8 +60,9 @@ while ~isDone(imgds)
 %     end
     a = flow.Magnitude;
     a(a < mean(a(:))) = 0;
-    ARES = cat(3, ARES, a);
-    
+    cat(3, 
+    ARES = ARES + mat2gray(a);
+    imshow(ARES);
     magnitude = cat(3, magnitude, flow.Magnitude);
     orientation = cat(3, orientation, flow.Orientation);
     
@@ -77,6 +78,8 @@ while ~isDone(imgds)
        pause(10^-3);
     end
 end
+
+
 
 release(imgds);
 release(preps);

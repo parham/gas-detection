@@ -18,17 +18,20 @@ classdef GroundTruthDifferentiate < matlab.System & ...
     methods(Access = protected)
         %% Common functions
         function setupImpl(obj)
-            groundTruth = [];
+            obj.groundTruth = [];
         end
 
-        function y = stepImpl(obj,u)
-            % Implement algorithm. Calculate y as a function of input u and
-            % discrete states.
-            y = u;
+        function [result, exeTime] = stepImpl(obj,frame)
+            t = cputime;
+            if isempty(obj.groundTruth)
+                obj.groundTruth = frame;
+            end
+            result = frame - obj.groundTruth;
+            exeTime = cputime - t;
         end
 
         function resetImpl(obj)
-            groundTruth = [];
+            obj.groundTruth = [];
         end
 
         %% Backup/restore functions
