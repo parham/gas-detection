@@ -17,11 +17,11 @@ classdef ROICropper < matlab.System & ...
                     'DefaultConfigFilePath', './+lemanchot/+imgproc/roi_cropper.yaml'));
             
             if isprop(obj, 'position') && iscell(obj.position)
-                obj.position = reshape(cell2array(obj.position), [], 2);
+                obj.position = reshape(cell2mat(obj.position), [], 2);
             end
             
             if isprop(obj, 'size') && iscell(obj.size)
-                obj.size = reshape(cell2array(obj.size), [], 2);
+                obj.size = reshape(cell2mat(obj.size), [], 2);
             end
         end
     end

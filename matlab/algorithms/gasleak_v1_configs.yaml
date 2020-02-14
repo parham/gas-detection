@@ -7,7 +7,8 @@ info:
   project: A Novel Approach of Drone-based IR Gas Leak Detection Using Image Flow Analysis
 
 img_dataset:
-  datasetPath: /home-local2/panoo.extra.nobkp/Datasets/TORNGATS_Optical_Gas/2040_exp01
+  #datasetPath: /home-local2/panoo.extra.nobkp/Datasets/TORNGATS_Optical_Gas/2040_exp01
+  datasetPath: /home/phm/MEGA/working_datasets/TORNGATS_Optical_Gas/exp01_2040/THM
   imgSize:
     - 600
     - 800

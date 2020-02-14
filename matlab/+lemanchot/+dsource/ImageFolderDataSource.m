@@ -24,7 +24,7 @@ classdef ImageFolderDataSource < matlab.System & ...
                     'DefaultConfigFilePath', './+lemanchot/+dsource/imgds_default.yaml'));
             
             if isprop(obj, 'imgSize') && iscell(obj.imgSize)
-                obj.imgSize = reshape(cell2array(obj.imgSize), [], 2);
+                obj.imgSize = reshape(cell2mat(obj.imgSize), [], 2);
             end
             
 %             if nargin > 0

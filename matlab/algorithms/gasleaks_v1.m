@@ -26,11 +26,9 @@ videoPlayer = vision.VideoPlayer('Name', ...
     'Enhancement of aerial gas leak using image flow analysis', ...
     'Position', [50 50 800 600]);
 
-of = opticalFlowFarneback;
+of = opticalFlowFarneback('NeighborhoodSize', 9, 'FilterSize', 25);
 
 magnitude = [];
-orientation = [];
-ARES = [];
 while ~isDone(imgds)
 %% Read a frame from image dataset
     [frame, index] = step(imgds);
@@ -47,7 +45,7 @@ while ~isDone(imgds)
 %% Calculate frame difference
     [diffimg, exeTime] = step(fdiffp, roi);
     
-    diffimg = adaptthresh(diffimg, 0.9, 'ForegroundPolarity', 'bright');
+    diffimg = adaptthresh(diffimg, 0.8, 'ForegroundPolarity', 'bright');
     diffimg = mat2gray(diffimg);
     level = graythresh(diffimg);
     bw = imbinarize(diffimg,level);
@@ -55,15 +53,10 @@ while ~isDone(imgds)
     
     %diffimg(diffimg <= std(diffimg(:))) = 0;
     flow = estimateFlow(of,diffimg);
-%     if isempty(mask)
-%         mask = zeros(size(flow.Magnitude), 'like', flow.Magnitude);
-%     end
-    a = flow.Magnitude;
-    a(a < mean(a(:))) = 0;
-    ARES = cat(3, ARES, a);
     
-    magnitude = cat(3, magnitude, flow.Magnitude);
-    orientation = cat(3, orientation, flow.Orientation);
+    magFrame = mat2gray(flow.Magnitude);
+    magFrame(magFrame < mean(magFrame(:))) = 0;
+    magnitude = cat(3, magnitude, magFrame);
     
     disp(['>>> Frame Difference executed : ', num2str(exeTime), ' seconds']);
     if showFootage
@@ -74,7 +67,16 @@ while ~isDone(imgds)
        out(pos(2):pos(2)+sz(2),pos(1):pos(1)+sz(1)) = diffimg;
        resimg = imfuse(result, out, 'blend','Scaling','joint');
        %step(videoPlayer,resimg);
-       pause(10^-3);
+       %pause(10^-3);
+    end
+end
+
+%% Calculate the probabilistic map
+severityThreshold = 
+for r=1:size(magnitude,2)
+    for c=1:size(magnitude,1)
+        tmp = magnitude(c,r,:);
+        
     end
 end
 
