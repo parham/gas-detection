@@ -72,13 +72,34 @@ while ~isDone(imgds)
 end
 
 %% Calculate the probabilistic map
-severityThreshold = 
-for r=1:size(magnitude,2)
-    for c=1:size(magnitude,1)
-        tmp = magnitude(c,r,:);
-        
-    end
+res = {};
+for thresh = 1:10
+    % ** Parameters
+    severityThreshold = 0.1 * thresh;
+    flowPropMap = magnitude;
+    % Remove the outliers which their magnitude is lower than the determined
+    % threshold.
+    flowPropMap(flowPropMap < severityThreshold) = 0;
+    % Determine the areas that may gas flow occurred!
+    flowPropMap(flowPropMap ~= 0) = 1;
+    % Calculate the probabilistic map of the flow
+    flowPropMap = mean(flowPropMap,3);
+    res{end+1} = flowPropMap;
 end
+montage(res);
+
+%% Use the probabilistic map to determine the area of gas flow and hot spot
+flowPropMap = res{4};
+% ** Parameters
+numberOfHistCluster = 10;
+hotspotLevel = 5;
+backgroundLevel = 1;
+
+[binCount, binIntensity, binMask] = histcounts(flowPropMap,numberOfHistCluster);
+hotspotMask = zeros(size(flowPropMap), 'like', flowPropMap);
+hotspotMask(binMask > hotspotLevel) = 1;
+gasFlowMask = zeros(size(flowPropMap), 'like', flowPropMap);
+gasFlowMask(binMask > backgroundLevel) = 1;
 
 release(imgds);
 release(preps);
