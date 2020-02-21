@@ -6,9 +6,13 @@ info:
   organization: Laval University
   project: A Novel Approach of Drone-based IR Gas Leak Detection Using Image Flow Analysis
 
+general:
+  windowSize: 70
+
 img_dataset:
   #datasetPath: /home-local2/panoo.extra.nobkp/Datasets/TORNGATS_Optical_Gas/2040_exp01
-  datasetPath: /home/phm/MEGA/working_datasets/TORNGATS_Optical_Gas/exp01_2040/THM
+  #datasetPath: /home/phm/MEGA/working_datasets/TORNGATS_Optical_Gas/exp01_2040/THM
+  datasetPath: /home/phm/MEGA/working_datasets/TORNGATS_Optical_Gas/exp02_2038
   imgSize:
     - 600
     - 800
@@ -19,10 +23,12 @@ fernando_vstab:
   transformType: similarity
 
 roi_crop:
+  imgSize:
+    - 600
+    - 800
   position:
     - 238
     - 1
   size:
     - 315
     - 178
-#    - 211

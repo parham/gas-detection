@@ -147,16 +147,16 @@ while ~isDone(imgds)
          rectangle('Position', [BB(1),BB(2),BB(3),BB(4)],'EdgeColor','b','LineWidth',2) ;
     end
     text('Position',[BB(1)-10,BB(2)-20],'string', str, 'Color', 'b', 'FontSize', 11);
-    hold off
+    %hold off
     pause(10^-3);
 end
 
-pause(1);
+pause(5);
 %% probability map display
 figure('Name','Probability map of the gas flow');
 mesh(flowPropMap);
 
-pause(5);
+pause(
 figure('Name','Detection of hotspots and gas flows'); 
 montage({hotspotOriginMask, flowOriginMask}, 'BorderSize', [3 3]);
 
