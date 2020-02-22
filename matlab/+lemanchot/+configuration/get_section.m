@@ -4,7 +4,7 @@ if ~isfield(config,section)
     error('The section does not exist.');
 end
 
-csec = getfield(config,section);
+csec = config.section;
     
 end
 

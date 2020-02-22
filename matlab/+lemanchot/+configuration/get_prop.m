@@ -6,7 +6,7 @@ if ~isfield(config,key) && nargin==2
 end
 
 if isfield(config,key)
-    value = getfield(config,key);
+    value = config.key;
 else
     value = defValue;
 end
