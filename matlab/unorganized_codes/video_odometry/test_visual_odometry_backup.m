@@ -4,7 +4,7 @@
 %    'NewTsukuba'));
 
 %images = imageDatastore('/home-local2/panoo.extra.nobkp/Datasets/ethz_aerial_mapper/cadastre_gray');
-images = imageDatastore('/home-local2/panoo.extra.nobkp/current_dataset/tunnel_inspection/18_png_samples');
+images = imageDatastore('/home-local2/panoo.extra.nobkp/Datasets/STM X8500 2020-02-21/Track_000013_TIFF16/');
 
 % Create the camera parameters object using camera intrinsics from the 
 % New Tsukuba dataset.

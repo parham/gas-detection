@@ -130,7 +130,7 @@ prevFeatures = currFeatures;
 prevPoints   = currPoints;
 
 recIndex = 0;
-recFlag = true;
+recFlag = false;
 %% Bootstrap Estimating Camera Trajectory Using Global Bundle Adjustment
 for viewId = 3:200
     % Read and display the next image
@@ -138,28 +138,20 @@ for viewId = 3:200
     Irgb = read_image(images, viewId);
     step(player, Irgb);
     
-    if recFlag
-        recIndex = recIndex + 1;
-        tmp = Irgb(32:92, 260:320);
-        binTemp = imbinarize(tmp);
-        [H, theta,rho]=hough(x);
-        data = [];
-        for cnt = 1:max(max(H))
-            data(cnt) = sum(sum(H == cnt));
-        end
-        [maxval,maxind] = max(data);
-        medval = median(data);
-        p = polyfit(1:maxind-5,data(1:maxind-5),2);
-        if p(3)>100
-            disp('Square');
-            recFlag = false;
-        end
-    else
-        if recIndex > 10
-            recFlag = true;
-            recIndex = 0;
-        end
-        recIndex = recIndex + 1;
+    recIndex = recIndex + 1;
+    tmp = Irgb(32:92, 260:320);
+    binTemp = imbinarize(tmp);
+    [H, theta,rho]=hough(x);
+    data = [];
+    for cnt = 1:max(max(H))
+        data(cnt) = sum(sum(H == cnt));
+    end
+    [maxval,maxind] = max(data);
+    medval = median(data);
+    p = polyfit(1:maxind-5,data(1:maxind-5),2);
+    if p(3)>100
+        disp('Square');
+        recFlag = true;
     end
     
     % Convert to gray scale and undistort.
