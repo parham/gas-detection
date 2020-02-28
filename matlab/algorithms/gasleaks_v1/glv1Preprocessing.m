@@ -19,13 +19,13 @@ classdef glv1Preprocessing < phm.core.phmCore
         
         function result = process (obj, frame)
             t = cputime;
-            if size(frame,3) > 1
+            if size(frame,3) ~= 1
                 result = mean(frame,3);
             else
                 result = frame;
             end
             result = double(mat2gray(result));
-            
+            result = imresize(result, obj.imgSize, obj.resizeMethod);
             if ~isempty(obj.previousFrame)
                 % Correct illumination differences between the moving and fixed images
                 % using histogram matching. This is a common pre-processing step.
