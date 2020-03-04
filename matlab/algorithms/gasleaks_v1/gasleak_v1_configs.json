@@ -16,7 +16,7 @@
 	},
 	"roi_crop" : {
 		"position" : [197, 10],
-		"size" : [500, 210],
+		"size" : [500, 220],
 		"state" : true
 	}
 }

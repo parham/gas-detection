@@ -1,0 +1,10 @@
+
+{
+	"project" : {
+		"name" : "An implementation of image stitching"
+	},
+	"data_source" : {
+		"datasetPath" : "/home-local2/panoo.extra.nobkp/current_dataset/image_stitching/sample_ds_3",
+		"fileExtension" : [".tif", ".png", ".jpg"]
+	}
+}

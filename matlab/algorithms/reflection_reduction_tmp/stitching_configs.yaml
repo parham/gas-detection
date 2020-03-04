@@ -1,0 +1,30 @@
+
+info:
+  author: Parham Nooralishahi
+  email: parham.nooralishahi@gmail.com
+  org_email: parham.nooralishahi.1@ulaval.ca
+  organization: Laval University
+
+dataset:
+  directory: /home-local2/panoo.extra.nobkp/current_dataset/image_stitching/sample_ds_3
+  #directory: /home-local2/panoo.extra.nobkp/Datasets/ethz_aerial_mapper/cadastre_gray
+  #filter: '*.tif'
+  filter: '*.jpg'
+
+preprocessing:
+  bounding_size: 400
+  focal_length: 2000
+
+matching:
+  metric_threshold: 598.958333
+  num_octave: 3
+  scale_level: 5
+  match_threshold: 40.625000
+  max_ratio: 0.406250
+
+register:
+  smooth_edge: true
+  nonrigid_trans: false
+  num_iteration: 100
+  accu_fieldsmoothing: 1.0
+  pyramidLevel: 3

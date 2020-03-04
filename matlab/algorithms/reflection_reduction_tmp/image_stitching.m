@@ -1,18 +1,12 @@
 
 clear;
 clc;
-%% Check Computer Vision Toolbox license
-% Check for license to Computer Vision Toolbox
-CVSTStatus = license('test','Video_and_Image_Blockset');
-if ~CVSTStatus
-    error(message('images:imageRegistration:CVSTRequired'));
-end
 
 %% Load the YAML configuration file from the determined path.
 % config = configuration.load_yaml_config('./home_configs.yaml');
-config = lemanchot.configuration.load_yaml_config('./stitching_configs.yaml');
+config = configuration.load_yaml_config('./stitching_configs.yaml');
 % print the info section of the config
-lemanchot.configuration.print_info(config);
+configuration.print_info(config);
 disp('Configuration file is loaded.');
 
 %% Load dataset
@@ -58,10 +52,10 @@ configuration.print_section(config,'register');
 [regs, stitchedSize, exeTime] = stitching.registration(frames, matches, regConfig);
 disp(['Registering steps has been applied to the frames (', num2str(exeTime), ' secs).']);
 
-% for index = 1:length(regs)-1
+for index = 1:length(regs)-1
 %     imshowpair(regs(index).RegisteredImage, regs(index + 1).CurrentRefObj,...
 %         regs(index + 1).RegisteredImage, regs(index + 1).CurrentRefObj, ...
 %         'blend','Scaling','joint')
-%     %imshow(regs(index).RegisteredImage);
-%     pause(10^-4);
-% end
+    imshow(regs(index).RegisteredImage);
+    pause(10^-4);
+end

@@ -4,34 +4,45 @@ clc;
 
 
 %% Load configuration
-disp('Load Configuration ...');
 phmConfig = phm.core.phmJsonConfigBucket('./algorithms/gasleaks_v1/gasleak_v1_configs.json');
+
 showFootage = false;
+progressbar.textprogressbar('Load Configuration: ');
+progressbar.textprogressbar(100);
+progressbar.textprogressbar(' done');
 
 %% System configuration check
-disp('Check System Configuration ...');
 if parallel.gpu.GPUDevice.isAvailable()
     disp('The installed GPU on this station can be used for data processing.');
 end
+progressbar.textprogressbar('Check System Configuration: ');
+progressbar.textprogressbar(100);
+progressbar.textprogressbar(' done');
 
 %% Data Source initialization
-disp('Data Source initialization ...');
+progressbar.textprogressbar('Data Source initialization: ');
 dsConfig = phmConfig.getConfig('data_source');
 imgds = imageDatastore(dsConfig.datasetPath, ...
     'FileExtensions', dsConfig.fileExtension);
+progressbar.textprogressbar(100);
+progressbar.textprogressbar(' done');
 
 %% Steps initialization
-disp('Pipeline steps initialization ...');
+progressbar.textprogressbar('Pipeline steps initialization: ');
 prepStep = glv1Preprocessing(phmConfig.getConfig('preprocessing'));
 roiStep = glv1ROICropper(phmConfig.getConfig('roi_crop'));
-
 fdifStep = glv1FrameDisplacementFromOrigin();
 of = opticalFlowFarneback('NeighborhoodSize', 9, 'FilterSize', 25);
+progressbar.textprogressbar(100);
+progressbar.textprogressbar(' done');
 
-% Processing for Gas leak detection
-disp('Process the frames for gas leak detection ...');
+%% Processing for Gas leak detection
+progressbar.textprogressbar('Process the frames for gas leak detection: ');
 magnitude = [];
 frameSize = [];
+
+progressStep = 1 / double(length(imgds.Files));
+index = 1;
 while hasdata(imgds)
     frame = read(imgds);
     prepres = prepStep.process(frame);
@@ -61,11 +72,16 @@ while hasdata(imgds)
         imshow(resimg);
         pause(10^-3);
     end
+    progressbar.textprogressbar(uint8(index * progressStep * 100));
+    index = index + 1;
 end
+progressbar.textprogressbar(' done');
 
 %% Calculate the probabilistic map
-disp('Calculate the probabilistic map ...');
-numThresh = 10
+progressbar.textprogressbar('Calculate the probabilistic map: ');
+numThresh = 10;
+progressStep = 1 / numThresh;
+index = 1;
 resProbMap = cell(1,numThresh);
 for thresh = 1:numThresh
     % ** Parameters
@@ -79,12 +95,15 @@ for thresh = 1:numThresh
     % Calculate the probabilistic map of the flow
     flowPropMap = mean(flowPropMap,3);
     resProbMap{thresh} = flowPropMap;
+    progressbar.textprogressbar(uint8(index * progressStep * 100));
+    index = index + 1;
 end
 figure('Name','Results: thresholding of probability map'); 
 montage(resProbMap, 'BorderSize', [3 3]);
+progressbar.textprogressbar(' done');
 
 %% Use the probabilistic map to determine the area of gas flow and hot spot
-disp('Determine the hotspots ...');
+progressbar.textprogressbar('Determine the hotspots: ');
 flowPropMap = resProbMap{4};
 numberOfHistCluster = 10;
 hotspotLevel = 5;
@@ -95,9 +114,11 @@ hotspotMask = zeros(size(flowPropMap), 'like', flowPropMap);
 hotspotMask(binMask > hotspotLevel) = 1;
 gasFlowMask = zeros(size(flowPropMap), 'like', flowPropMap);
 gasFlowMask(binMask > backgroundLevel) = 1;
+progressbar.textprogressbar(100);
+progressbar.textprogressbar(' done');
 
 %% Merge the mask
-disp('Prepare the masks ...');
+progressbar.textprogressbar('Prepare the masks: ');
 x = roiStep.position(1);
 y = roiStep.position(2);
 w = roiStep.size(1);
@@ -118,6 +139,8 @@ figure('Name','Gas Leak Detection');
 reset(imgds);
 stats = regionprops(hotspotOriginMask, 'BoundingBox');
 flowStats = regionprops(flowOriginMask, 'BoundingBox');
+progressStep = 1 / double(length(imgds.Files));
+progressIndex = 1;
 while hasdata(imgds)
     [frame, index] = read(imgds);
     imagesc(frame);
@@ -137,10 +160,13 @@ while hasdata(imgds)
     end
     text('Position',[BB(1)-10,BB(2)-20],'string', str, 'Color', 'b', 'FontSize', 11);
     hold off
+    progressbar.textprogressbar(uint8(progressIndex * progressStep * 100));
+    progressIndex = progressIndex + 1;
     pause(10^-3);
 end
-
-pause(1);
+progressbar.textprogressbar(100);
+progressbar.textprogressbar(' done');
+pause(0.1);
 
 %% probability map display
 figure('Name','Probability map of the gas flow');
