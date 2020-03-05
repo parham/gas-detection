@@ -6,5 +6,24 @@
 	"data_source" : {
 		"datasetPath" : "/home-local2/panoo.extra.nobkp/current_dataset/image_stitching/sample_ds_3",
 		"fileExtension" : [".tif", ".png", ".jpg"]
+	},
+	"preprocessing" : {
+		"imgSize" : [600, 800],
+		"resizeMethod" : "nearest"
+	},
+	"matching" : {
+		"metricThreshold" : 598.958333,
+		"numOctave" : 3,
+		"scaleLevel" : 5,
+		"matchThreshold" : 40.625000,
+		"maxRatio" : 0.406250,
+		"transformType" : "projective"
+	},
+	"register" : {
+		  "smooth_edge": true,
+		  "nonrigid_trans" : false,
+		  "num_iteration" : 100,
+		  "accu_fieldsmoothing" : 1.0,
+		  "pyramidLevel" : 3
 	}
 }

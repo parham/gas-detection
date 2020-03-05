@@ -31,7 +31,19 @@ progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');
 
 %% Steps initialization
-progressbar.textprogressbar('Pipeline steps initialization: ');
+prepStep = msv1PreprocessingStep(phmConfig.getConfig('preprocessing'));
+matStep = msv1MatchingStep(phmConfig.getConfig('matching'));
 
+%% Frame registeration
+progressbar.textprogressbar('Pipeline steps initialization: ');
+while hasdata(imgds)
+    frame = read(imgds);
+    prepres = prepStep.process(frame);
+    [fmat, status] = matStep.process(frame);
+    if status == 1 || status == 2
+        warning(['features of frame (', str2double(index), ') do not contain enough points']);
+        continue;
+    end
+end
 progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');
