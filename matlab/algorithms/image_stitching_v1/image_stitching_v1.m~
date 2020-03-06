@@ -3,8 +3,6 @@
 clear;
 clc;
 
-showFootage = false;
-
 %% Check Computer Vision Toolbox license
 progressbar.textprogressbar('Check Computer Vision Toolbox license: ');
 progressbar.textprogressbar(100);
@@ -49,12 +47,10 @@ progressbar.textprogressbar(' done');
 prepStep = msv1PreprocessingStep(phmConfig.getConfig('preprocessing'));
 matStep = msv1MatchingStep(phmConfig.getConfig('matching'));
 
-%% Frame processing and matching
+%% Frame registeration
 progressbar.textprogressbar('Pipeline steps initialization: ');
 figure('Name','Stitching result viewer'); 
 
-matches = cell(1, length(imgds.Files));
-index = 1;
 while hasdata(imgds)
     frame = read(imgds);
     prepres = prepStep.process(frame);
@@ -67,40 +63,14 @@ while hasdata(imgds)
         continue;
     end
     
-    matches{index} = fmat;
-    index = index + 1;
-    
     if isfield(fmat, 'Transformation')
         RegisteredImage = imwarp(fmat.Frame, fmat.Ref2d, fmat.Transformation);
     else
         RegisteredImage = fmat.Frame;
     end
-    
-    if showFootage
-        % Display the current frame and its processing steps
-        montage({frame, prepres, RegisteredImage},'BorderSize', [3 3]);
-        pause(10^-3);
-    end
+    % Display the current frame and its processing steps
+    montage({frame, prepres, RegisteredImage},'BorderSize', [3 3]);
+    pause(10^-3);
 end
 progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');
-
-%% Image registeration
-figure('Name','Registering result viewer'); 
-regStep = msv1RegistrationStep(phmConfig.getConfig('register'));
-[envConfig] = regStep.preprocess(matches);
-for index = 1:length(matches)
-    frame = matches{index};
-    registered = regStep.process(frame, envConfig);
-    imshow(registered);
-    pause(10^-3);
-end
-
-
-
-
-
-
-
-
-

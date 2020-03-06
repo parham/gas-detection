@@ -44,7 +44,7 @@ classdef msv1MatchingStep < phm.core.phmCore
                     currentFrame.SelectedFeatures, ...
                     obj.previousFrame.SelectedFeatures, obj.transformType);
             end
-            % Calculate global transformation matrix
+            % Calculate global transformation matrix of each frame
             if ~isempty(obj.previousFrame) && status == 0
                 if isfield(obj.previousFrame, 'AbsoluteTransformation')
                     ptrans = obj.previousFrame.AbsoluteTransformation.T;
@@ -54,6 +54,9 @@ classdef msv1MatchingStep < phm.core.phmCore
                 else
                     currentFrame.AbsoluteTransformation = currentFrame.Transformation;
                 end
+            else
+                currentFrame.Transformation = projective2d;
+                currentFrame.AbsoluteTransformation = projective2d;
             end
             
             result = currentFrame;
