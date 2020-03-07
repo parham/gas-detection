@@ -3,7 +3,7 @@
 clear;
 clc;
 
-showFootage = false;
+showFootage = true;
 
 %% Check Computer Vision Toolbox license
 progressbar.textprogressbar('Check Computer Vision Toolbox license: ');
@@ -81,6 +81,7 @@ while hasdata(imgds)
         montage({frame, prepres, RegisteredImage},'BorderSize', [3 3]);
         pause(10^-3);
     end
+    progressbar.textprogressbar((index / length(imgds.Files)) * 100.0);
 end
 progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');

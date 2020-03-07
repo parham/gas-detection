@@ -8,6 +8,7 @@ clc;
 %% Load the dataset
 % Dataset path
 dirPath = '/home-local2/panoo.extra.nobkp/current_dataset/image_stitching/airplane_exp01';
+%dirPath = '/home-local2/panoo.extra.nobkp/current_dataset/reflection_reduction/exp01_sample02';
 % dirPath = '/home/phm/MEGA/working_datasets/reflection_reduction/exp02_sensefly_solar_panel_reflection';
 %dirPath = '/home/phm/MEGA/working_datasets/data/reflection_02';
 fileExt = '*.tif';
@@ -53,7 +54,8 @@ for index = 2:length(flist)
     orig = imread(flist{index});
     % Adjust the contrast to span it to all range
     warning('on','all')
-    orig = imadjust(orig);
+    orig = mat2gray(orig);
+    %orig = imadjust(orig);
     % Apply the image resize
     frame = imresize(orig, scaleRatio);
     % Append the read frame to the collection
@@ -209,10 +211,12 @@ for i = 1:frameCount
     
     result(baseH:baseH+height-1, baseW:baseW+width-1) = ...
         result(baseH:baseH+height-1, baseW:baseW+width-1) + ...
-        mapFrames(:,:,i) .* mask;
+        mapFrames(:,:,i);
     denominator(baseH:baseH+height-1, baseW:baseW+width-1) = ...
-        denominator(baseH:baseH+height-1, baseW:baseW+width-1) + ...
-        mask;
+        denominator(baseH:baseH+height-1, baseW:baseW+width-1);
+    
+    imshow(result);
+    pause(10^-3);
 end
 
 result = result ./ denominator;
