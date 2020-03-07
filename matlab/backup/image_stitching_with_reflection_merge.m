@@ -168,7 +168,7 @@ for i = 1:frameCount
         maxH = baseH;
     end
     if baseH < minH
-        minH = bash_h;
+        minH = bashH;
     end
     if baseW > maxW
         maxW = baseW;
