@@ -1,25 +1,16 @@
-classdef msv1RegistrationStep < phm.core.phmCore
-    
-    properties
-        stitchedResult,
-        blenderObj
-    end
+classdef msv2RegistrationStep < phm.core.phmCore
     
     methods
-        function obj = msv1RegistrationStep(configs)
+        function obj = msv2RegistrationStep(configs)
             obj = obj@phm.core.phmCore(configs);
             obj.reset();
         end
         
         function [] = reset (obj)
             reset@phm.core.phmCore(obj);
-            obj.stitchedResult = [];
-            obj.blenderObj = vision.AlphaBlender('Operation', ...
-                'Binary mask', 'MaskSource', 'Input port'); 
         end
         
         function [result, frames] = preprocess (~, frames)
-            
             result = struct;
             
             % Initialize Frame size
@@ -51,6 +42,32 @@ classdef msv1RegistrationStep < phm.core.phmCore
                 frames{index}.AbsoluteTransformation.T(1, 3) = ... 
                     frames{index}.AbsoluteTransformation.T(1, 3) - floor(minY);                
             end
+            
+            % Merging
+            maxH = 0;
+            minH = 0;
+            maxW = 0;
+            minW = 0;
+            
+            for index = 1:length(frames)
+                pPrime = absTrans(:,:,i) * [1;1;1];
+                pPrime = pPrime ./ pPrime(3);
+                baseH = floor(pPrime(1));
+                baseW = floor(pPrime(2));
+                if baseH > maxH
+                    maxH = baseH;
+                end
+                if baseH < minH
+                    minH = bashH;
+                end
+                if baseW > maxW
+                    maxW = baseW;
+                end
+                if baseW < minW
+                    minW = baseW;
+                end
+            end
+            
         end
         
         function [result, frame] = process (obj, frame, envConfig)
@@ -60,16 +77,16 @@ classdef msv1RegistrationStep < phm.core.phmCore
                 obj.stitchedResult = zeros(envConfig.stitchedSize, 'like', frame.Frame(:,:,1));
             end
             
-            frame.RegisteredMask = imwarp(true(size(frame.Frame,1), ...
-                size(frame.Frame,2)), frame.AbsoluteTransformation, ...
-                    'OutputView', envConfig.worldRef2d);
-            frame.RegisteredImage = imwarp(frame.Frame, frame.Ref2d, ...
-                frame.AbsoluteTransformation, 'OutputView', ...
-                    envConfig.worldRef2d, 'SmoothEdges', obj.smoothEdge);
-            obj.stitchedResult = step(obj.blenderObj, obj.stitchedResult, ...
-                frame.RegisteredImage, frame.RegisteredMask);
-            result = obj.stitchedResult;
-                
+            img = im2double(frame.Frame);
+            % Create the mask
+%             mask = ones(height, width);
+%             mask = warp(mask, focal);
+%             mask = imcomplement(mask);
+%             mask = bwdist(mask, 'euclidean');
+%             mask = mask ./ max(max(mask));
+            mask = nan(envConfig.imageSize); 
+            
+            
             obj.lastExecutionTime = cputime - t;
         end
     end
