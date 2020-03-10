@@ -3,7 +3,7 @@
 clear;
 clc;
 
-showFootage = true;
+showFootage = false;
 
 %% Load configuration
 progressbar.textprogressbar('Load Configuration: ');
@@ -36,13 +36,18 @@ progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');
 
 %% Steps initialization
+progressbar.textprogressbar('Pipeline steps initialization: ');
 prepStep = msv2PreprocessingStep(phmConfig.getConfig('preprocessing'));
 matStep = msv2MatchingStep(phmConfig.getConfig('matching'));
+regStep = msv2RegistrationStep(phmConfig.getConfig('register'));
+progressbar.textprogressbar(100);
+progressbar.textprogressbar(' done');
 
 %% Frame processing and matching
-progressbar.textprogressbar('Pipeline steps initialization: ');
+progressbar.textprogressbar('Frame matching step: ');
 figure('Name','Stitching result viewer'); 
 matches = cell(1, length(imgds.Files));
+
 index = 1;
 while hasdata(imgds)
     frame = read(imgds);
@@ -65,9 +70,18 @@ while hasdata(imgds)
     end
     progressbar.textprogressbar((index / length(imgds.Files)) * 100.0);
 end
-progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');
 
+%% Frame registration
+disp('Perform pre-processing steps for the registration');
+[envConfig, matches] = regStep.preprocess(matches);
 
-
-
+progressbar.textprogressbar('Frame registration: ');
+for index = 1:length(matches)
+    frame = regStep.process(matches{index}, envConfig);
+    progressbar.textprogressbar((index / length(matches)) * 100.0);
+    
+    imshow(frame.TransformedFrame);
+    pause(10^-3);
+end
+progressbar.textprogressbar(' done');

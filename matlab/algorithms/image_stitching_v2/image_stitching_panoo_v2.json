@@ -4,26 +4,20 @@
 		"name" : "An implementation of image stitching"
 	},
 	"data_source" : {
-		"datasetPath" : "/home-local2/panoo.extra.nobkp/current_dataset/image_stitching/airplane_exp01",
-		"fileExtension" : [".tif", ".png", ".jpg"]
+		"datasetPath" : "/home-local2/panoo.extra.nobkp/current_dataset/image_stitching/sample_ds_2",
+		"fileExtension" : [".tif", ".png", ".jpg", ".JPG"]
 	},
 	"preprocessing" : {
-		"imgSize" : [600, 800],
+		"heightBound" : 400,
 		"resizeMethod" : "nearest"
 	},
 	"matching" : {
-		"metricThreshold" : 498.958333,
-		"numOctave" : 3,
-		"scaleLevel" : 5,
-		"matchThreshold" : 50.625000,
-		"maxRatio" : 0.406250,
-		"transformType" : "projective"
+		"edgeThresh" : 10,
+		"confidence" : 0.99,
+		"inlierRatio" : 0.3,
+		"epsilon" : 1.5
 	},
 	"register" : {
-		  "smoothEdge": true,
-		  "nonrigid_trans" : false,
-		  "num_iteration" : 100,
-		  "accu_fieldsmoothing" : 1.0,
-		  "pyramidLevel" : 3
+		  "smoothEdge": true
 	}
 }

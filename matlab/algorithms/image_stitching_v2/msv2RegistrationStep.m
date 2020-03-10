@@ -1,5 +1,10 @@
 classdef msv2RegistrationStep < phm.core.phmCore
     
+    properties
+        StitchedFrame,
+        StitchedMask
+    end
+    
     methods
         function obj = msv2RegistrationStep(configs)
             obj = obj@phm.core.phmCore(configs);
@@ -8,9 +13,11 @@ classdef msv2RegistrationStep < phm.core.phmCore
         
         function [] = reset (obj)
             reset@phm.core.phmCore(obj);
+            obj.StitchedFrame = [];
+            obj.StitchedMask = [];
         end
         
-        function [result, frames] = preprocess (~, frames)
+        function [result, frames] = preprocess (obj, frames)
             result = struct;
             
             % Initialize Frame size
@@ -35,58 +42,59 @@ classdef msv2RegistrationStep < phm.core.phmCore
             result.worldRef2d = imref2d([stitchedHeight + 120, stitchedWidth + 120], ...
                 result.worldXLimits, result.worldYLimits);
             
-            % Update the frame's transformation matrix
-            for index = 1:length(frames)
-                frames{index}.AbsoluteTransformation.T(2, 3) = ... 
-                    frames{index}.AbsoluteTransformation.T(2, 3) - floor(minX);
-                frames{index}.AbsoluteTransformation.T(1, 3) = ... 
-                    frames{index}.AbsoluteTransformation.T(1, 3) - floor(minY);                
-            end
-            
             % Merging
             maxH = 0;
             minH = 0;
             maxW = 0;
             minW = 0;
             
+            % Update the frame's transformation matrix
             for index = 1:length(frames)
-                pPrime = absTrans(:,:,i) * [1;1;1];
+                frames{index}.AbsoluteTransformation.T(2, 3) = ... 
+                    frames{index}.AbsoluteTransformation.T(2, 3) - floor(minX);
+                frames{index}.AbsoluteTransformation.T(1, 3) = ... 
+                    frames{index}.AbsoluteTransformation.T(1, 3) - floor(minY);
+                
+                pPrime = frames{index}.AbsoluteTransformation.T * [1; 1; 1];
                 pPrime = pPrime ./ pPrime(3);
                 baseH = floor(pPrime(1));
                 baseW = floor(pPrime(2));
-                if baseH > maxH
-                    maxH = baseH;
-                end
-                if baseH < minH
-                    minH = bashH;
-                end
-                if baseW > maxW
-                    maxW = baseW;
-                end
-                if baseW < minW
-                    minW = baseW;
-                end
+                
+                maxH = max(maxH, baseH);
+                minH = min(minH, baseH);
+                maxW = max(maxW, baseW);
+                minW = min(minW, baseW);
+                
+                frames{index}.Frame = im2double(frames{index}.Frame);
             end
             
+            tmp = frames{1}.Frame;
+            result.baseDimension = [minW minH; maxW maxH];
+            obj.StitchedFrame = zeros(result.stitchedSize, 'like', tmp);
+            obj.StitchedMask = zeros(result.stitchedSize, 'like', tmp);
         end
         
-        function [result, frame] = process (obj, frame, envConfig)
+        function [frame] = process (obj, frame, envConfig)
             t = cputime;
-            
-            if isempty(obj.stitchedResult)
-                obj.stitchedResult = zeros(envConfig.stitchedSize, 'like', frame.Frame(:,:,1));
+            pPrime = frame.AbsoluteTransformation.T * ...
+                [envConfig.baseDimension(2,1) + 10; envConfig.baseDimension(1,1) + 10; 1];
+            pPrime = pPrime ./ pPrime(3);
+            baseH = floor(pPrime(1));
+            baseW = floor(pPrime(2));
+            if baseH == 0
+                baseH = 1;
             end
+            if baseW == 0
+                baseW = 1;
+            end
+            % Keep thermal data
+            frame.TransformedFrame = zeros(envConfig.stitchedSize, 'like', frame.Frame);
+            frame.TransformedMask = zeros(envConfig.stitchedSize, 'like', frame.Frame);
             
-            img = im2double(frame.Frame);
-            % Create the mask
-%             mask = ones(height, width);
-%             mask = warp(mask, focal);
-%             mask = imcomplement(mask);
-%             mask = bwdist(mask, 'euclidean');
-%             mask = mask ./ max(max(mask));
-            mask = nan(envConfig.imageSize); 
-            
-            
+            width = envConfig.imageSize(2);
+            height = envConfig.imageSize(1);
+            frame.TransformedFrame(baseH:baseH+height-1, baseW:baseW+width-1) = frame.Frame;
+
             obj.lastExecutionTime = cputime - t;
         end
     end
