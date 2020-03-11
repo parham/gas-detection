@@ -61,6 +61,7 @@ while hasdata(imgds)
     
     match = matStep.process(prepres);
     matches{index} = match;
+    match.AbsoluteTransformation.T
     index = index + 1;
     
     if showFootage

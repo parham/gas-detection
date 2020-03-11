@@ -4,7 +4,7 @@
 		"name" : "An implementation of image stitching"
 	},
 	"data_source" : {
-		"datasetPath" : "/home/phm/MEGA/working_datasets/image_stitching/Pond_test",
+		"datasetPath" : "/home/phm/MEGA/working_datasets/image_stitching/solar_panel",
 		"fileExtension" : [".tif", ".png", ".jpg", ".JPG"]
 	},
 	"preprocessing" : {
@@ -18,10 +18,6 @@
 		"epsilon" : 1.5
 	},
 	"register" : {
-		  "smoothEdge": true,
-		  "nonrigid_trans" : false,
-		  "num_iteration" : 100,
-		  "accu_fieldsmoothing" : 1.0,
-		  "pyramidLevel" : 3
+		  "smoothEdge": true
 	}
 }
