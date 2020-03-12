@@ -1,4 +1,4 @@
-function mosaic = sift_mosaic(im1, im2)
+function [res, trans] = sift_mosaic(im1, im2)
 % SIFT_MOSAIC Demonstrates matching two images using SIFT and RANSAC
 %
 %   SIFT_MOSAIC demonstrates matching two images based on SIFT
@@ -12,7 +12,7 @@ function mosaic = sift_mosaic(im1, im2)
 
 if nargin == 0
   im1 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0575.JPG') ;
-  %im2 = imrotate(im1,30);
+  %im2 = imrotate(im1,30);image segmentation using deep learning
   im2 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0576.JPG') ;
 end
 
@@ -41,12 +41,26 @@ numMatches = size(matches,2) ;
 X1 = f1(1:2,matches(1,:));
 X2 = f2(1:2,matches(2,:));
 
-[trans, ~, ~, status] = estimateGeometricTransform(X2', X1', 'affine');
+[trans, ~, ~, status] = estimateGeometricTransform(X2', X1', 'projective');
+
+im2ref = imref2d(size(im2g));
+
+[res res2ref] = imwarp(im2g, im2ref, trans);
+
+tmp = res2ref;
+
+mask = imwarp(ones(size(im2g)), im2ref, trans);
 
 
+c = imfuse(im1g, imref2d(size(im1g)), res, res2ref,'blend');
+ 
+tmp = zeros(size(res).*2);
+tmp2d = imref2d(size(tmp), [100, 100 + size(tmp,2)], [100, 100 + size(tmp,1)]);
+c2 = imfuse(tmp, tmp2d, res, res2ref,'blend');
 
-res = imwarp(im2g, trans);
+montage({im1g, im2g, res});
 
-montage({im1g, im2g, res})
+figure; imshow(c);
+figure; imshow(c2);
 
 end
