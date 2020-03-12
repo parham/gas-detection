@@ -74,8 +74,6 @@ classdef msv2RegistrationStep < phm.core.phmCore
             obj.StitchedMask = zeros(result.stitchedSize, 'like', tmp);
         end
         
-        
-        
         function [A_padded,B_padded,A_mask,B_mask,R_output] = calculateOverlayTwoImages(A,RA,B,RB)
             % First calculate output referencing object. World limits are minimum
             % bounding box that contains world limits of both images. Resolution is the
@@ -106,6 +104,8 @@ classdef msv2RegistrationStep < phm.core.phmCore
             A_mask = contains(RA,xWorldOverlayLoc,yWorldOverlayLoc);
             B_mask = contains(RB,xWorldOverlayLoc,yWorldOverlayLoc);
         end
+        
+        function [frame] = generateOverlay (obj, frames)
         
         function [regres, res2dref] = process (obj, frame, envConfig)
             t = cputime;

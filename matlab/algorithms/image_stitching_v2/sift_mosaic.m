@@ -1,4 +1,4 @@
-function [res, trans] = sift_mosaic(im1, im2)
+
 % SIFT_MOSAIC Demonstrates matching two images using SIFT and RANSAC
 %
 %   SIFT_MOSAIC demonstrates matching two images based on SIFT
@@ -10,11 +10,11 @@ function [res, trans] = sift_mosaic(im1, im2)
 
 % AUTORIGHTS
 
-if nargin == 0
-  im1 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0575.JPG') ;
-  %im2 = imrotate(im1,30);image segmentation using deep learning
-  im2 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0576.JPG') ;
-end
+im1 = imread('/home-local2/panoo.extra.nobkp/Datasets/my-dataset/image_stitching/Pond_test2/DJI_0575.JPG') ;
+%   im1 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0575.JPG') ;
+%   im2 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0576.JPG') ;
+im2 = imread('/home-local2/panoo.extra.nobkp/Datasets/my-dataset/image_stitching/Pond_test2/DJI_0576.JPG') ;
+
 
 % make single
 im1 = im2single(im1) ;
@@ -31,6 +31,8 @@ if size(im2,3) > 1, im2g = rgb2gray(im2) ; else im2g = im2 ; end
 %                                                         SIFT matches
 % --------------------------------------------------------------------
 
+alphablend = vision.AlphaBlender
+
 [f1,d1] = vl_sift(im1g, 'EdgeThresh', 10);
 [f2,d2] = vl_sift(im2g, 'EdgeThresh', 10);
 
@@ -43,24 +45,17 @@ X2 = f2(1:2,matches(2,:));
 
 [trans, ~, ~, status] = estimateGeometricTransform(X2', X1', 'projective');
 
+im1ref = imref2d(size(im1g));
 im2ref = imref2d(size(im2g));
 
 [res res2ref] = imwarp(im2g, im2ref, trans);
 
-tmp = res2ref;
+%mask = imwarp(ones(size(im2g)), im2ref, trans);
 
-mask = imwarp(ones(size(im2g)), im2ref, trans);
+c = imfuse(im1g, im1ref, res, res2ref,'blend');
 
+im1mask = zeros(size(im1g), 'like', im1g);
+c2 = imfuse(res, res2ref, im1mask, im1ref, 'blend');
 
-c = imfuse(im1g, imref2d(size(im1g)), res, res2ref,'blend');
- 
-tmp = zeros(size(res).*2);
-tmp2d = imref2d(size(tmp), [100, 100 + size(tmp,2)], [100, 100 + size(tmp,1)]);
-c2 = imfuse(tmp, tmp2d, res, res2ref,'blend');
-
-montage({im1g, im2g, res});
-
-figure; imshow(c);
-figure; imshow(c2);
-
-end
+figure; montage({im1g, im2g, res});
+figure; montage({c2, c});
