@@ -74,60 +74,52 @@ classdef msv2RegistrationStep < phm.core.phmCore
             obj.StitchedMask = zeros(result.stitchedSize, 'like', tmp);
         end
         
-        
+        function [regConfig] = initialize (~, frames)
+            regConfig = struct;
+            regConfig.OutputWorldLimitsX = ... 
+                [min(cellfun(@(f) f.Ref2d.XWorldLimits(1), frames)), ...
+                 max(cellfun(@(f) f.Ref2d.XWorldLimits(2), frames))];
+            regConfig.OutputWorldLimitsY = ...
+                [min(cellfun(@(f) f.Ref2d.YWorldLimits(1), frames)), ...
+                 max(cellfun(@(f) f.Ref2d.YWorldLimits(2), frames))];
+
+            regConfig.GoalResolutionX = min(cellfun(@(f) f.Ref2d.PixelExtentInWorldX, frames));
+            regConfig.GoalResolutionY = min(cellfun(@(f) f.Ref2d.PixelExtentInWorldY, frames));
+
+            regConfig.WidthOutputRaster  = ceil(diff(regConfig.OutputWorldLimitsX) / ... 
+                regConfig.GoalResolutionX);
+            regConfig.HeightOutputRaster = ceil(diff(regConfig.OutputWorldLimitsY) / ...
+                regConfig.GoalResolutionY);
+            
+            regConfig.Ref2d = imref2d([regConfig.HeightOutputRaster, regConfig.WidthOutputRaster]);
+            regConfig.Ref2d.XWorldLimits = regConfig.OutputWorldLimitsX;
+            regConfig.Ref2d.YWorldLimits = regConfig.OutputWorldLimitsY;
+        end
         
         function [A_padded,B_padded,A_mask,B_mask,R_output] = calculateOverlayTwoImages(A,RA,B,RB)
-            % First calculate output referencing object. World limits are minimum
-            % bounding box that contains world limits of both images. Resolution is the
-            % minimum resolution in each dimension. We don't want to down sample either
-            % image.
-            outputWorldLimitsX = [min(RA.XWorldLimits(1),RB.XWorldLimits(1)),...
-                                  max(RA.XWorldLimits(2),RB.XWorldLimits(2))];
-
-            outputWorldLimitsY = [min(RA.YWorldLimits(1),RB.YWorldLimits(1)),...
-                                  max(RA.YWorldLimits(2),RB.YWorldLimits(2))];                 
-
-            goalResolutionX = min(RA.PixelExtentInWorldX,RB.PixelExtentInWorldX);
-            goalResolutionY = min(RA.PixelExtentInWorldY,RB.PixelExtentInWorldY);
-
-            widthOutputRaster  = ceil(diff(outputWorldLimitsX) / goalResolutionX);
-            heightOutputRaster = ceil(diff(outputWorldLimitsY) / goalResolutionY);
-
-            R_output = imref2d([heightOutputRaster, widthOutputRaster]);
-            R_output.XWorldLimits = outputWorldLimitsX;
-            R_output.YWorldLimits = outputWorldLimitsY;
-
-            fillVal = 0;
-            A_padded = images.spatialref.internal.resampleImageToNewSpatialRef(A,RA,R_output,'bilinear',fillVal);
-            B_padded = images.spatialref.internal.resampleImageToNewSpatialRef(B,RB,R_output,'bilinear',fillVal);
-
+            
             [outputIntrinsicX,outputIntrinsicY] = meshgrid(1:R_output.ImageSize(2),1:R_output.ImageSize(1));
             [xWorldOverlayLoc,yWorldOverlayLoc] = intrinsicToWorld(R_output,outputIntrinsicX,outputIntrinsicY);
             A_mask = contains(RA,xWorldOverlayLoc,yWorldOverlayLoc);
             B_mask = contains(RB,xWorldOverlayLoc,yWorldOverlayLoc);
         end
         
-        function [regres, res2dref] = process (obj, frame, envConfig)
+        function [registered] = process (obj, frame, regConfig)
             t = cputime;
-            pPrime = frame.AbsoluteTransformation.T * ...
-                [envConfig.baseDimension(2,1) + 10; envConfig.baseDimension(1,1) + 10; 1];
-            pPrime = pPrime ./ pPrime(3);
-            baseH = floor(pPrime(1));
-            baseW = floor(pPrime(2));
-            if baseH == 0
-                baseH = 1;
-            end
-            if baseW == 0
-                baseW = 1;
-            end
-            % Keep thermal data
-            frame.TransformedFrame = zeros(envConfig.stitchedSize, 'like', frame.Frame);
-            frame.TransformedMask = zeros(envConfig.stitchedSize, 'like', frame.Frame);
             
-            width = envConfig.imageSize(2);
-            height = envConfig.imageSize(1);
-            frame.TransformedFrame(baseH:baseH+height-1, baseW:baseW+width-1) = frame.Frame;
-
+            registered = frame;
+            registered.WarppedFrame = images.spatialref.internal.resampleImageToNewSpatialRef( ...
+                registered.WarppedFrame, registered.Ref2d, ...
+                    regConfig.Ref2d, obj.interpolationMethod, obj.fillVal);
+            registered.WarppedMask = images.spatialref.internal.resampleImageToNewSpatialRef( ...
+                registered.WarppedMask, registered.Ref2d, ...
+                    regConfig.Ref2d, obj.interpolationMethod, obj.fillVal);
+            
+%             [outputIntrinsicX,outputIntrinsicY] = meshgrid(1:regConfig.Ref2d.ImageSize(2), ...
+%                                                            1:regConfig.Ref2d.ImageSize(1));
+%             [xWorldOverlayLoc,yWorldOverlayLoc] = intrinsicToWorld(regConfig.Ref2d, ...
+%                 outputIntrinsicX, outputIntrinsicY);
+            
             obj.lastExecutionTime = cputime - t;
         end
     end

@@ -3,7 +3,7 @@
 clear;
 clc;
 
-showFootage = false;
+showFootage = true;
 
 %% Load configuration
 progressbar.textprogressbar('Load Configuration: ');
@@ -40,6 +40,7 @@ progressbar.textprogressbar('Pipeline steps initialization: ');
 prepStep = msv2PreprocessingStep(phmConfig.getConfig('preprocessing'));
 matStep = msv2MatchingStep(phmConfig.getConfig('matching'));
 regStep = msv2RegistrationStep(phmConfig.getConfig('register'));
+blendStep = msv2BlendingStep(phmConfig.getConfig('blending'));
 progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');
 
@@ -59,10 +60,18 @@ while hasdata(imgds)
     prepres = prepStep.process(frame);
     viscell{end + 1} = prepres;
     
-    match = matStep.process(prepres);
+    [match, status] = matStep.process(prepres);
+    
+    if status == 1
+        warning(['features of frame (', str2double(index), ') do not contain enough points']);
+        continue;
+    elseif status == 2
+        warning(['For frame (', str2double(index), '), Not enough inliers have been found.']);
+        continue;
+    end
     matches{index} = match;
-    match.AbsoluteTransformation.T
     index = index + 1;
+    viscell{end + 1} = match.WarppedFrame;
     
     if showFootage
         % Display the current frame and its processing steps
@@ -74,15 +83,27 @@ end
 progressbar.textprogressbar(' done');
 
 %% Frame registration
-disp('Perform pre-processing steps for the registration');
-[envConfig, matches] = regStep.preprocess(matches);
+disp('Perform pre-processing steps for the registration to measure the environment configurations');
+[regConfig] = regStep.initialize(matches);
 
+figure;
 progressbar.textprogressbar('Frame registration: ');
+index = 1;
 for index = 1:length(matches)
-    frame = regStep.process(matches{index}, envConfig);
+    matches{index} = regStep.process(matches{index}, regConfig);
     progressbar.textprogressbar((index / length(matches)) * 100.0);
-    
-    imshow(frame.TransformedFrame);
-    pause(10^-3);
+    if showFootage
+        montage({matches{index}.WarppedFrame, matches{index}.WarppedMask});
+        pause(10^-3);
+    end
+    progressbar.textprogressbar((index / length(matches)) * 100.0);
 end
 progressbar.textprogressbar(' done');
+
+%% Frame blending
+progressbar.textprogressbar('Frame blending: ');
+[result, overlapped] = blendStep.process(matches);
+figure; montage({result, overlapped});
+progressbar.textprogressbar(100);
+progressbar.textprogressbar(' done');
+

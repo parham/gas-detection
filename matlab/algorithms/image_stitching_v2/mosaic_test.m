@@ -10,11 +10,10 @@
 
 % AUTORIGHTS
 
-im1 = imread('/home-local2/panoo.extra.nobkp/Datasets/my-dataset/image_stitching/Pond_test2/DJI_0575.JPG') ;
-%   im1 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0575.JPG') ;
-%   im2 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0576.JPG') ;
-im2 = imread('/home-local2/panoo.extra.nobkp/Datasets/my-dataset/image_stitching/Pond_test2/DJI_0576.JPG') ;
-
+% im1 = imread('/home-local2/panoo.extra.nobkp/Datasets/my-dataset/image_stitching/Pond_test2/DJI_0575.JPG') ;
+im1 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0575.JPG') ;
+im2 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0576.JPG') ;
+% im2 = imread('/home-local2/panoo.extra.nobkp/Datasets/my-dataset/image_stitching/Pond_test2/DJI_0576.JPG') ;
 
 % make single
 im1 = im2single(im1) ;
@@ -48,7 +47,7 @@ X2 = f2(1:2,matches(2,:));
 im1ref = imref2d(size(im1g));
 im2ref = imref2d(size(im2g));
 
-[res res2ref] = imwarp(im2g, im2ref, trans);
+[res, res2ref] = imwarp(im2g, im2ref, trans);
 
 %mask = imwarp(ones(size(im2g)), im2ref, trans);
 

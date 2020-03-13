@@ -12,6 +12,7 @@
 		"resizeMethod" : "nearest"
 	},
 	"matching" : {
+		"transformType" : "projective",
 		"edgeThresh" : 10,
 		"confidence" : 0.99,
 		"inlierRatio" : 0.3,
