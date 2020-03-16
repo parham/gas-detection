@@ -2,6 +2,10 @@ classdef msv2BlendingStep < phm.core.phmCore
     %MSV2BLENDINGSTEP Summary of this class goes here
     %   Detailed explanation goes here
     
+    properties
+        currentOutput
+    end
+    
     methods
         function obj = msv2BlendingStep(configs)
             obj = obj@phm.core.phmCore(configs);
@@ -10,32 +14,39 @@ classdef msv2BlendingStep < phm.core.phmCore
         
         function [] = reset (obj)
             reset@phm.core.phmCore(obj);
+            obj.currentOutput = [];
         end
         
-        function [result, overlapped] = process (obj, frames)
+        function [result] = process (obj, frame)
             t = cputime;
-
-            result = frames{1}.WarppedFrame;
-            for index = 2:length(frames)
-                frm = frames{index}.WarppedFrame;
-                msk = frames{index}.WarppedMask;
-                edMask = edge(a.WarppedMask,'Prewitt');
-                edMask = imdilate(edMask, strel('disk',10));
-                edMask = imgaussfilt(double(edMask),11);
-                edMask(msk == 0) = 0;
-                edMask(msk ~= 0) = 1 - edMask(msk ~= 0);
+            if isempty(obj.currentOutput)
+                obj.currentOutput = struct;
+                obj.currentOutput.Frame = frame.WarppedFrame;
+                obj.currentOutput.Mask = frame.BlendMask;
+            else
+                frm = frame.WarppedFrame;
+                if strcmp(obj.operation,'EdgedOrientedOverwrite')
+                    [obj.currentOutput.Mask, pos] = max(cat(3,obj.currentOutput.Mask,frame.BlendMask), [], 3);
+                    obj.currentOutput.Frame(pos == 2) = frm(pos == 2);
+                elseif strcmp(obj.operation,'WeightedBlend')
+%                     [obj.currentOutput.Mask, pos] = max(cat(3,obj.currentOutput.Mask,frame.BlendMask), [], 3);
+                    div = obj.currentOutput.Mask + frame.BlendMask;
+                    tmp = ((obj.currentOutput.Frame .* obj.currentOutput.Mask) + ...
+                        (frm .* frame.BlendMask)) ./ div;
+                    res = obj.currentOutput.Frame;
+                    res(obj.currentOutput.Mask ~= 0) = obj.currentOutput.Frame(obj.currentOutput.Mask ~= 0);
+                    res(obj.currentOutput.Mask == 0 & frame.BlendMask ~= 0) = ...
+                        frm(obj.currentOutput.Mask == 0 & frame.BlendMask ~= 0);
+                    res(obj.currentOutput.Mask ~= 0 & frame.BlendMask ~= 0) = ...
+                        tmp(obj.currentOutput.Mask ~= 0 & frame.BlendMask ~= 0);
+                    obj.currentOutput.Frame = res;
+                    obj.currentOutput.Mask = div;
+                    obj.currentOutput.Mask(div > 1) = 1;
+                end
+                
             end
             
-%             res = frames{1}.WarppedFrame;
-%             resMask = frames{1}.WarppedMask;
-%             for index = 2:length(frames)
-%                 frm = frames{index}.WarppedFrame;
-%                 msk = frames{index}.WarppedMask;
-%                 res = cat(3,res, frm);
-%                 resMask = cat(3,resMask,msk);
-%             end
-%             
-%             [result, overlapped] = reflection_dr(res, resMask);
+            result = obj.currentOutput;
             obj.lastExecutionTime = cputime - t;
         end
     end

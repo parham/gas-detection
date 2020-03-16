@@ -23,7 +23,20 @@
 		"interpolationMethod" : "bilinear",
 		"fillVal" : 0
 	},
+	"blend_mask" : {
+		"edgeMethod" : "Prewitt",
+		"edgeSpread" : 12,
+		"edgeBlur" : 15
+	},
+	"reflection" : {
+		"pyramidLevel" : 3,
+		"pyramidScale" : 0.5,
+		"iteration" : 3,
+		"neighborSize" : 5,
+		"filterSize" : 15,
+		"intersecThreshold" : 0.3
+	},
 	"blending" : {
-		"operation" : "Blend"
+		"operation" : "EdgedOrientedOverwrite"
 	}
 }

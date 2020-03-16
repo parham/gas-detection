@@ -40,6 +40,7 @@ progressbar.textprogressbar('Pipeline steps initialization: ');
 prepStep = msv2PreprocessingStep(phmConfig.getConfig('preprocessing'));
 matStep = msv2MatchingStep(phmConfig.getConfig('matching'));
 regStep = msv2RegistrationStep(phmConfig.getConfig('register'));
+blendMaskStep = msv2LogicMaskPreparationStep(phmConfig.getConfig('blend_mask'));
 blendStep = msv2BlendingStep(phmConfig.getConfig('blending'));
 progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');
@@ -82,28 +83,31 @@ while hasdata(imgds)
 end
 progressbar.textprogressbar(' done');
 
-%% Frame registration
+%% Frame registration and blend preparation
 disp('Perform pre-processing steps for the registration to measure the environment configurations');
 [regConfig] = regStep.initialize(matches);
 
 figure;
-progressbar.textprogressbar('Frame registration: ');
+progressbar.textprogressbar('Frame registration and blending: ');
 index = 1;
+res = [];
 for index = 1:length(matches)
     matches{index} = regStep.process(matches{index}, regConfig);
-    progressbar.textprogressbar((index / length(matches)) * 100.0);
+    matches{index} = blendMaskStep.process(matches{index});
+    res = blendStep.process(matches{index});
     if showFootage
-        montage({matches{index}.WarppedFrame, matches{index}.WarppedMask});
+        montage({matches{index}.WarppedFrame, ... 
+            matches{index}.WarppedMask, matches{index}.BlendMask, ...
+            res.Frame, res.Mask});
         pause(10^-3);
     end
     progressbar.textprogressbar((index / length(matches)) * 100.0);
 end
 progressbar.textprogressbar(' done');
 
-%% Frame blending
-progressbar.textprogressbar('Frame blending: ');
-[result, overlapped] = blendStep.process(matches);
-figure; montage({result, overlapped});
-progressbar.textprogressbar(100);
-progressbar.textprogressbar(' done');
+progressbar.textprogressbar('Frame registration and blending: ');
+for index = 1:length(matches)
+    
+end
+
 
