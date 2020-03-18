@@ -29,7 +29,6 @@ prorg = reshape(pixarr, [frmSize(1), frmSize(2)]);
 % prorg = cellfun(@(x) min(x(x ~= 0)), prorg, 'UniformOutput', false);
 % prorgRes = cellfun(@reduceRef, prorg, 'UniformOutput', false);
 % ploc = cellfun(@findRef, prorg, 'UniformOutput', false);
-loc = cell2mat(ploc);
 
 vals = zeros([frmSize(1), frmSize(2)], 'like', confrm);
 panels = zeros([frmSize(1), frmSize(2)], 'like', confrm);
@@ -64,32 +63,3 @@ for row = 4:size(confrm,1)-4
 %         vals(row,col) = vmat;
     end
 end
-% 
-% 
-% result = cell2mat(prorgRes);
-% imshow(result);
-% 
-% function [res] = findRef (x)
-%     ind = 1:length(x);
-%     tmp = x(x ~= 0);
-%     ind = ind(x ~= 0);
-%     if min(size(tmp)) == 0
-%         res = 0;
-%     else
-% %         Rres = lengt(tmp);
-%         [~, res] = min(tmp);
-%         res = ind(res);
-%     end
-% end
-% 
-% function [res] = reduceRef (x)
-%     tmp = x(x ~= 0);
-%     if min(size(tmp)) == 0
-%         res = 0;
-%     else
-%         res = min(tmp);
-%     end
-% end
-
-
-

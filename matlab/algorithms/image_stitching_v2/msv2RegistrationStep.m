@@ -96,14 +96,6 @@ classdef msv2RegistrationStep < phm.core.phmCore
             regConfig.Ref2d.YWorldLimits = regConfig.OutputWorldLimitsY;
         end
         
-        function [A_padded,B_padded,A_mask,B_mask,R_output] = calculateOverlayTwoImages(A,RA,B,RB)
-            
-            [outputIntrinsicX,outputIntrinsicY] = meshgrid(1:R_output.ImageSize(2),1:R_output.ImageSize(1));
-            [xWorldOverlayLoc,yWorldOverlayLoc] = intrinsicToWorld(R_output,outputIntrinsicX,outputIntrinsicY);
-            A_mask = contains(RA,xWorldOverlayLoc,yWorldOverlayLoc);
-            B_mask = contains(RB,xWorldOverlayLoc,yWorldOverlayLoc);
-        end
-        
         function [registered] = process (obj, frame, regConfig)
             t = cputime;
             
@@ -114,12 +106,7 @@ classdef msv2RegistrationStep < phm.core.phmCore
             registered.WarppedMask = images.spatialref.internal.resampleImageToNewSpatialRef( ...
                 registered.WarppedMask, registered.Ref2d, ...
                     regConfig.Ref2d, obj.interpolationMethod, obj.fillVal);
-            
-%             [outputIntrinsicX,outputIntrinsicY] = meshgrid(1:regConfig.Ref2d.ImageSize(2), ...
-%                                                            1:regConfig.Ref2d.ImageSize(1));
-%             [xWorldOverlayLoc,yWorldOverlayLoc] = intrinsicToWorld(regConfig.Ref2d, ...
-%                 outputIntrinsicX, outputIntrinsicY);
-            
+
             obj.lastExecutionTime = cputime - t;
         end
     end

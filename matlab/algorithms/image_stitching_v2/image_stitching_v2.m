@@ -42,6 +42,8 @@ matStep = msv2MatchingStep(phmConfig.getConfig('matching'));
 regStep = msv2RegistrationStep(phmConfig.getConfig('register'));
 blendMaskStep = msv2LogicMaskPreparationStep(phmConfig.getConfig('blend_mask'));
 blendStep = msv2BlendingStep(phmConfig.getConfig('blending'));
+refStep = msv2ReflectionLRStep(phmConfig.getConfig('reflection'));
+refStep2 = msv2ReflectionLRStep2(phmConfig.getConfig('reflection'));
 progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');
 
@@ -94,20 +96,18 @@ res = [];
 for index = 1:length(matches)
     matches{index} = regStep.process(matches{index}, regConfig);
     matches{index} = blendMaskStep.process(matches{index});
+    %result = refStep.process(matches(1:index));
+    result = refStep2.process(matches{index});
     res = blendStep.process(matches{index});
     if showFootage
         montage({matches{index}.WarppedFrame, ... 
             matches{index}.WarppedMask, matches{index}.BlendMask, ...
-            res.Frame, res.Mask});
+            res.Frame, res.Mask, ...
+            result.Result, result.ReflectionArea});
         pause(10^-3);
     end
     progressbar.textprogressbar((index / length(matches)) * 100.0);
 end
 progressbar.textprogressbar(' done');
-
-progressbar.textprogressbar('Frame registration and blending: ');
-for index = 1:length(matches)
-    
-end
 
 
