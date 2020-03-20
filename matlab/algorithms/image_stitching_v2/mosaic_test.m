@@ -1,60 +1,19 @@
 
-% SIFT_MOSAIC Demonstrates matching two images using SIFT and RANSAC
-%
-%   SIFT_MOSAIC demonstrates matching two images based on SIFT
-%   features and RANSAC and computing their mosaic.
-%
-%   SIFT_MOSAIC by itself runs the algorithm on two standard test
-%   images. Use SIFT_MOSAIC(IM1,IM2) to compute the mosaic of two
-%   custom images IM1 and IM2.
 
-% AUTORIGHTS
+lemanchot.utils.imds2png( ...
+    '/home/phm/MEGA/working_datasets/reflection_reduction/exp02_sensefly_solar_panel_reflection',...
+    '*.tif', ...
+    '/home/phm/MEGA/working_datasets/reflection_reduction/exp02_sensefly_solar_panel_reflection_png',@prefunc);
 
-% im1 = imread('/home-local2/panoo.extra.nobkp/Datasets/my-dataset/image_stitching/Pond_test2/DJI_0575.JPG') ;
-im1 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0575.JPG') ;
-im2 = imread('/home/phm/MEGA/working_datasets/image_stitching/Pond_test2/DJI_0576.JPG') ;
-% im2 = imread('/home-local2/panoo.extra.nobkp/Datasets/my-dataset/image_stitching/Pond_test2/DJI_0576.JPG') ;
+function [] = initPrepc ()
+    global props 
+    configPath = sprintf('./algorithms/image_stitching_v2/image_stitching_%s_v2_exp2.json', ...
+        phm.utils.phmSystemUtils.getOSUser);
+    phmConfig = phm.core.phmJsonConfigBucket(configPath);
+    props = msv2PreprocessingStep(phmConfig.getConfig('preprocessing'));
+end
 
-% make single
-im1 = im2single(im1) ;
-im2 = im2single(im2) ;
-
-im1 = imresize(im1, [600 800]);
-im2 = imresize(im2, [600 800]);
-
-% make grayscale
-if size(im1,3) > 1, im1g = rgb2gray(im1) ; else im1g = im1 ; end
-if size(im2,3) > 1, im2g = rgb2gray(im2) ; else im2g = im2 ; end
-
-% --------------------------------------------------------------------
-%                                                         SIFT matches
-% --------------------------------------------------------------------
-
-alphablend = vision.AlphaBlender
-
-[f1,d1] = vl_sift(im1g, 'EdgeThresh', 10);
-[f2,d2] = vl_sift(im2g, 'EdgeThresh', 10);
-
-[matches, scores] = vl_ubcmatch(d1,d2) ;
-
-numMatches = size(matches,2) ;
-
-X1 = f1(1:2,matches(1,:));
-X2 = f2(1:2,matches(2,:));
-
-[trans, ~, ~, status] = estimateGeometricTransform(X2', X1', 'projective');
-
-im1ref = imref2d(size(im1g));
-im2ref = imref2d(size(im2g));
-
-[res, res2ref] = imwarp(im2g, im2ref, trans);
-
-%mask = imwarp(ones(size(im2g)), im2ref, trans);
-
-c = imfuse(im1g, im1ref, res, res2ref,'blend');
-
-im1mask = zeros(size(im1g), 'like', im1g);
-c2 = imfuse(res, res2ref, im1mask, im1ref, 'blend');
-
-figure; montage({im1g, im2g, res});
-figure; montage({c2, c});
+function [res] = prefunc (img)
+    global props
+    res = props.process(img);
+end

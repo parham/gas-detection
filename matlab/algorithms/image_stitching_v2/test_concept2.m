@@ -58,7 +58,7 @@ frames = confrm;
 
 pixarr = reshape(confrm,[],size(confrm,3));
 pixarr = mat2cell(pixarr,ones(1,size(pixarr,1)),size(pixarr,2));
-pixarr = reshape(pixarr, [frmSize(1), frmSize(2)]);
+pixarr = reshape(pixarr, [size(confrm,1), size(confrm,2)]);
 prorg = cellfun(@nonzeros, pixarr, 'UniformOutput', false);
 prorg = cellfun(@min, prorg, 'UniformOutput', false);
 msk = cellfun(@isempty, prorg);

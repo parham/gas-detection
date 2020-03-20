@@ -43,7 +43,6 @@ classdef msv2BlendingStep < phm.core.phmCore
                     obj.currentOutput.Mask = div;
                     obj.currentOutput.Mask(div > 1) = 1;
                 end
-                
             end
             
             result = obj.currentOutput;
@@ -51,4 +50,3 @@ classdef msv2BlendingStep < phm.core.phmCore
         end
     end
 end
-

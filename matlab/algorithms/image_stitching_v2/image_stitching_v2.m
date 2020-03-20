@@ -1,5 +1,4 @@
 
-
 clear;
 clc;
 
@@ -7,7 +6,9 @@ showFootage = true;
 
 %% Load configuration
 progressbar.textprogressbar('Load Configuration: ');
-configPath = sprintf('./algorithms/image_stitching_v2/image_stitching_%s_v2.json', ...
+% configPath = sprintf('./algorithms/image_stitching_v2/image_stitching_%s_v2.json', ...
+%     phm.utils.phmSystemUtils.getOSUser);
+configPath = sprintf('./algorithms/image_stitching_v2/image_stitching_%s_v2_exp2.json', ...
     phm.utils.phmSystemUtils.getOSUser);
 disp(['Config file: ', configPath]);
 if ~isfile(configPath)
@@ -59,12 +60,9 @@ while hasdata(imgds)
     viscell = {};
     viscell{end + 1} = frame;
     %%%%
-    
     prepres = prepStep.process(frame);
     viscell{end + 1} = prepres;
-    
     [match, status] = matStep.process(prepres);
-    
     if status == 1
         warning(['features of frame (', str2double(index), ') do not contain enough points']);
         continue;
@@ -91,7 +89,6 @@ disp('Perform pre-processing steps for the registration to measure the environme
 
 figure;
 progressbar.textprogressbar('Frame registration and blending: ');
-index = 1;
 res = [];
 for index = 1:length(matches)
     matches{index} = regStep.process(matches{index}, regConfig);
@@ -102,8 +99,7 @@ for index = 1:length(matches)
     if showFootage
         montage({matches{index}.WarppedFrame, ... 
             matches{index}.WarppedMask, matches{index}.BlendMask, ...
-            res.Frame, res.Mask, ...
-            result.Result, result.ReflectionArea});
+            res.Frame, res.Mask, result});
         pause(10^-3);
     end
     progressbar.textprogressbar((index / length(matches)) * 100.0);
