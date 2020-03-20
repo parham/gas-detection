@@ -1,17 +1,51 @@
 
+%% Project Description
+% @author Parham Nooralishahi
+% @email parham.nooralishahi@gmail.com
+% @email parham.nooralishahi.1@ulaval.ca
+% @organization Laval University - TORNGATS
+% @date 2020 March
+% @version 1.0
+%
+% @description In recent decades, thanks to the advancement of IR cameras, 
+% the use of this equipment for the non-destructive inspection of industrial
+% sites has been growing increasingly for a variety of oil and gas applications, 
+% such as mechanical inspection, and the examination of pipe integrity. 
+% Recently, there is a rising interest in the application of gas imaging in 
+% various industries. Gas imaging can significantly enhance functional 
+% safety by early detection of hazardous gas leaks. Moreover, based on 
+% current efforts to decrease greenhouse gas emissions all around the world 
+% by using new technologies such as Optical Gas Imaging (OGI) to identify 
+% possible gas leakages regularly, the need for techniques to automate the 
+% inspection process can be essential. One of the main challenges in gas 
+% imaging is the proximity condition required for data to be more reliable 
+% for analysis. Therefore, the use of unmanned aerial vehicles can be very 
+% advantageous as they can provide significant access due to their maneuver
+% capabilities. Despite the advantages of using drones, their movements, 
+% and sudden motions during hovering can diminish data usability. 
+% In this paper, we investigate the employment of drones in gas imaging 
+% applications. Also, we present a novel approach to enhance the visibility 
+% of gas leaks in aerial thermal footages using image flow analysis. 
+% Moreover, we investigate the use of the phase correlation technique for 
+% the reduction of drone movements during hovering. The significance of the 
+% results presented in this paper demonstrates the possible use of this 
+% approach in the industry.
+
+% First add vlfeat-0.9.21 library included in the project to the path!
+
 clear;
 clc;
 
-
 %% Load configuration
-phmConfig = phm.core.phmJsonConfigBucket('./algorithms/gasleaks_v1/gasleak_v1_configs.json');
-
+configPath = sprintf('gasleak_%s_v1_configs.json', ...
+    phm.utils.phmSystemUtils.getOSUser);
+phmConfig = phm.core.phmJsonConfigBucket(configPath);
 showFootage = false;
 progressbar.textprogressbar('Load Configuration: ');
 progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');
-
 %% System configuration check
+
 if parallel.gpu.GPUDevice.isAvailable()
     disp('The installed GPU on this station can be used for data processing.');
 end
@@ -29,10 +63,17 @@ progressbar.textprogressbar(' done');
 
 %% Steps initialization
 progressbar.textprogressbar('Pipeline steps initialization: ');
-prepStep = glv1Preprocessing(phmConfig.getConfig('preprocessing'));
-roiStep = glv1ROICropper(phmConfig.getConfig('roi_crop'));
-fdifStep = glv1FrameDisplacementFromOrigin();
-of = opticalFlowFarneback('NeighborhoodSize', 9, 'FilterSize', 25);
+flattenStep = phm.imgproc.FlattenImage();
+normStepFunc = @phm.imgproc.ImageProcessingUtils.normalizeAndMakingDouble;
+resizeStep = phm.imgproc.ImageResizer(phmConfig.getConfig('resizing'));
+histStep = phm.imgproc.HistogramBasedStreamNormalizer();
+roiStep = phm.roi.ROICropper(phmConfig.getConfig('roi'));
+fdifStep = phm.imgproc.FrameDifferenceFromOrigin(struct);
+% Initialize Optical Flow
+ofconfig = phmConfig.getConfig('optical_flow');
+of = opticalFlowFarneback( ...
+    'NeighborhoodSize', ofconfig.neighborhoodSize, ...
+    'FilterSize', ofconfig.filterSize);
 progressbar.textprogressbar(100);
 progressbar.textprogressbar(' done');
 
@@ -43,13 +84,18 @@ frameSize = [];
 
 progressStep = 1 / double(length(imgds.Files));
 index = 1;
+frames = cell(1,length(imgds.Files));
 while hasdata(imgds)
     frame = read(imgds);
-    prepres = prepStep.process(frame);
+    prp = flattenStep.process(frame);
+    prp = normStepFunc(prp);
+    prp = resizeStep.process(prp);
+    prp = histStep.process(prp);
+    frames{index} = prp;
     if isempty(frameSize)
-        frameSize = size(prepres);
+        frameSize = size(prp);
     end
-    roires = roiStep.process(prepres);
+    roires = roiStep.process(prp);
     fdres = fdifStep.process(roires);
     
     diffimg = adaptthresh(fdres, 0.8, 'ForegroundPolarity', 'bright');
@@ -136,13 +182,13 @@ end
 
 pause(3);
 figure('Name','Gas Leak Detection'); 
-reset(imgds);
+% reset(imgds);
 stats = regionprops(hotspotOriginMask, 'BoundingBox');
 flowStats = regionprops(flowOriginMask, 'BoundingBox');
 progressStep = 1 / double(length(imgds.Files));
 progressIndex = 1;
-while hasdata(imgds)
-    [frame, index] = read(imgds);
+for index = 1:length(frames)
+    frame = frames{index};
     imagesc(frame);
     hold on
     BB = [];

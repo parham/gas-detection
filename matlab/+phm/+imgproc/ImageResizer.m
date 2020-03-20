@@ -1,8 +1,18 @@
+
+%% Description
+% @author Parham Nooralishahi
+% @email parham.nooralishahi@gmail.com
+% @email parham.nooralishahi.1@ulaval.ca
+% @organization Laval University - TORNGATS
+% @date 2020 March
+% @version 1.0
+%
+
 classdef ImageResizer < phm.core.phmCore
     
     methods
-        function obj = ImageResizer(configs)
-            obj = obj@phm.core.phmCore(configs);
+        function obj = ImageResizer(varargin)
+            obj = obj@phm.core.phmCore(varargin);
             obj.reset();
         end
         

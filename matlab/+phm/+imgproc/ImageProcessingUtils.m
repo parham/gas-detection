@@ -1,3 +1,13 @@
+
+%% Description
+% @author Parham Nooralishahi
+% @email parham.nooralishahi@gmail.com
+% @email parham.nooralishahi.1@ulaval.ca
+% @organization Laval University - TORNGATS
+% @date 2020 March
+% @version 1.0
+%
+
 classdef ImageProcessingUtils
     %IMAGEPROCESSINGUTILS Utilies to be used in projects
     

@@ -1,3 +1,13 @@
+
+%% Description
+% @author Parham Nooralishahi
+% @email parham.nooralishahi@gmail.com
+% @email parham.nooralishahi.1@ulaval.ca
+% @organization Laval University - TORNGATS
+% @date 2020 March
+% @version 1.0
+%
+
 function [batch, exeTime] = read_image_as_batch(flist, sizeBound)
 %READ_IMAGE_AS_BATCH Read images and contain them into a batch matrix
 t = cputime;

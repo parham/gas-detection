@@ -1,3 +1,13 @@
+
+%% Description
+% @author Parham Nooralishahi
+% @email parham.nooralishahi@gmail.com
+% @email parham.nooralishahi.1@ulaval.ca
+% @organization Laval University - TORNGATS
+% @date 2020 March
+% @version 1.0
+%
+
 classdef FrameDifferenceFromOrigin < phm.core.phmCore    
 
     properties
@@ -5,8 +15,8 @@ classdef FrameDifferenceFromOrigin < phm.core.phmCore
     end
     
     methods
-        function obj = FrameDifferenceFromOrigin(configs)
-            obj = obj@phm.core.phmCore(configs);
+        function obj = FrameDifferenceFromOrigin(varargin)
+            obj = obj@phm.core.phmCore(varargin);
             obj.reset();
         end
         

@@ -1,3 +1,13 @@
+
+%% Description
+% @author Parham Nooralishahi
+% @email parham.nooralishahi@gmail.com
+% @email parham.nooralishahi.1@ulaval.ca
+% @organization Laval University - TORNGATS
+% @date 2020 March
+% @version 1.0
+%
+
 function [st] = props2struct(props)
 %PROPS2STRUCT Convert Properties array to MATLAB structure
     propsArr = props(~cellfun('isempty',props));

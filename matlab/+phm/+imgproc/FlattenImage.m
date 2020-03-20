@@ -1,8 +1,18 @@
+
+%% Description
+% @author Parham Nooralishahi
+% @email parham.nooralishahi@gmail.com
+% @email parham.nooralishahi.1@ulaval.ca
+% @organization Laval University - TORNGATS
+% @date 2020 March
+% @version 1.0
+%
+
 classdef FlattenImage < phm.core.phmCore
     
     methods
-        function obj = FlattenImage(configs)
-            obj = obj@phm.core.phmCore(configs);
+        function obj = FlattenImage(varargin)
+            obj = obj@phm.core.phmCore(varargin);
             obj.reset();
         end
         
@@ -19,15 +29,6 @@ classdef FlattenImage < phm.core.phmCore
             else
                 result = frame;
             end
-            result = double(mat2gray(result));
-            result = imresize(result, obj.imgSize, obj.resizeMethod);
-            if ~isempty(obj.previousFrame)
-                % Correct illumination differences between the moving and fixed images
-                % using histogram matching. This is a common pre-processing step.
-                result = imhistmatch(result, obj.previousFrame);
-            end
-            
-            obj.previousFrame = result;
             obj.lastExecutionTime = cputime - t;
         end
     end

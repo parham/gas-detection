@@ -1,3 +1,13 @@
+
+%% Description
+% @author Parham Nooralishahi
+% @email parham.nooralishahi@gmail.com
+% @email parham.nooralishahi.1@ulaval.ca
+% @organization Laval University - TORNGATS
+% @date 2020 March
+% @version 1.0
+%
+
 classdef HistogramBasedStreamNormalizer < phm.core.phmCore
 
     properties
@@ -5,8 +15,8 @@ classdef HistogramBasedStreamNormalizer < phm.core.phmCore
     end
     
     methods
-        function obj = HistogramBasedStreamNormalizer(configs)
-            obj = obj@phm.core.phmCore(configs);
+        function obj = HistogramBasedStreamNormalizer(varargin)
+            obj = obj@phm.core.phmCore(varargin);
             obj.reset();
         end
         

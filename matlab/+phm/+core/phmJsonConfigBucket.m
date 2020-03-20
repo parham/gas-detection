@@ -1,3 +1,13 @@
+
+%% Description
+% @author Parham Nooralishahi
+% @email parham.nooralishahi@gmail.com
+% @email parham.nooralishahi.1@ulaval.ca
+% @organization Laval University - TORNGATS
+% @date 2020 March
+% @version 1.0
+%
+
 classdef phmJsonConfigBucket
     %PHMJSONCONFIGBUCKET Summary of this class goes here
     %   Detailed explanation goes here
@@ -27,13 +37,14 @@ classdef phmJsonConfigBucket
                 infost.organization = 'Laval University';
                 obj.configBucket.info = infost;
             end
+            obj.print_info();
         end
         
         function config = getConfig(obj, section)
             if isempty(obj.configBucket)
                 error('Configuration bucket does not initialized!');
             end
-            config = [];
+            config = struct;
             if isfield(obj.configBucket, section)
                 config = obj.configBucket.(section);
             end
@@ -47,7 +58,7 @@ classdef phmJsonConfigBucket
             
             disp('');
             disp('<strong>******************************</strong>');
-            if isfield(config,'info')
+            if isfield(obj.configBucket,'info')
                 info = obj.configBucket.info;
                 fields = fieldnames(info);
                 for i = 1:length(fields)

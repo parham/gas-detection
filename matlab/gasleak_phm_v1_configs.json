@@ -4,19 +4,24 @@
 		"name" : "A Novel Approach of Drone-based IR Gas Leak Detection Using Image Flow Analysis"
 	},
 	"data_source" : {
-		"datasetPath" : "/home/phm/MEGA/working_datasets/TORNGATS_Optical_Gas/exp01_2040/THM",
+		"datasetPath" : "/home/phm/Insync/parham.nooralishahi@gmail.com/Google Drive/Experiments/Gas Leake Detection/exp01_2040/THM",
 		"fileExtension" : [".tif", ".png"]
 	},
-	"preprocessing" : {
+	"resizing" : {
 		"imgSize" : [600, 800],
 		"resizeMethod" : "nearest"
 	},
 	"video_stablizer" : {
 		"transformType" : "similarity"
 	},
-	"roi_crop" : {
+	"roi" : {
+		"guiInit" : true,
 		"position" : [190, 10],
 		"size" : [250, 150],
 		"state" : true
+	},
+	"optical_flow" : {
+		"neighborhoodSize" : 9,
+		"filterSize" : 25	
 	}
 }
