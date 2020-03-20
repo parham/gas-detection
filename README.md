@@ -1,21 +1,4 @@
-# le-manchot-python
 
-"LeManchot" is a platform to facilitate non-destructive inspection using the fusion of multiple imagery data sources.
+# Gas Leak Detection using Thermal Image Flow Analysis
 
-## Requirements
-
-### Conda (optional)
-
-### OpenCV 3.4
-you can install opencv via pip or conda, but make sure it has non-free modules.
-
-````
-conda install -c menpo opencv
-
-# le-manchot-matlab
-
-1. YAML
-
-https://github.com/ewiger/yamlmatlab
-
-2. Install Computer Vision toolbox
+In recent decades, thanks to the advancement of IR cameras, the use of this equipment for the non-destructive inspection of industrial sites has been growing increasingly for a variety of oil and gas applications, such as mechanical inspection, and the examination of pipe integrity. Recently, there is a rising interest in the application of gas imaging in various industries. Gas imaging can significantly enhance functional safety by early detection of hazardous gas leaks. Moreover, based on current efforts to decrease greenhouse gas emissions all around the world by using new technologies such as Optical Gas Imaging (OGI) to identify possible gas leakages regularly, the need for techniques to automate the inspection process can be essential. One of the main challenges in gas imaging is the proximity condition required for data to be more reliable for analysis. Therefore, the use of unmanned aerial vehicles can be very advantageous as they can provide significant access due to their maneuver capabilities. Despite the advantages of using drones, their movements, and sudden motions during hovering can diminish data usability. In this paper, we investigate the employment of drones in gas imaging applications. Also, we present a novel approach to enhance the visibility of gas leaks in aerial thermal footages using image flow analysis. Moreover, we investigate the use of the phase correlation technique for the reduction of drone movements during hovering. The significance of the results presented in this paper demonstrates the possible use of this approach in the industry.
